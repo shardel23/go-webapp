@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(50)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  rating       Int      @default(1200)
+  gamesPlayed  Int      @default(0) @map("games_played")
+  gamesWon     Int      @default(0) @map("games_won")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  blackGames          Game[]             @relation("BlackPlayer")
+  whiteGames          Game[]             @relation("WhitePlayer")
+  wonGames            Game[]             @relation("Winner")
+  moves               Move[]
+  matchmakingQueue    MatchmakingQueue[]
+  sentInvitations     GameInvitation[]   @relation("Inviter")
+  receivedInvitations GameInvitation[]   @relation("Invitee")
+
+  @@map("users")
+}
+
+model Game {
+  id            Int       @id @default(autoincrement())
+  blackPlayerId Int?      @map("black_player_id")
+  whitePlayerId Int?      @map("white_player_id")
+  boardSize     Int       @default(19) @map("board_size")
+  status        String    @default("active") @db.VarChar(20)
+  winnerId      Int?      @map("winner_id")
+  result        String?   @db.VarChar(20)
+  blackScore    Int?      @default(0) @map("black_score")
+  whiteScore    Int?      @default(0) @map("white_score")
+  boardState    String?   @map("board_state") @db.Text
+  startedAt     DateTime  @default(now()) @map("started_at")
+  finishedAt    DateTime? @map("finished_at")
+  sgfData       String?   @map("sgf_data") @db.Text
+
+  // Relations
+  blackPlayer User?  @relation("BlackPlayer", fields: [blackPlayerId], references: [id])
+  whitePlayer User?  @relation("WhitePlayer", fields: [whitePlayerId], references: [id])
+  winner      User?  @relation("Winner", fields: [winnerId], references: [id])
+  moves       Move[]
+
+  @@map("games")
+}
+
+model Move {
+  id             Int      @id @default(autoincrement())
+  gameId         Int      @map("game_id")
+  playerId       Int      @map("player_id")
+  moveNumber     Int      @map("move_number")
+  xCoordinate    Int?     @map("x_coordinate")
+  yCoordinate    Int?     @map("y_coordinate")
+  isPass         Boolean  @default(false) @map("is_pass")
+  isResign       Boolean  @default(false) @map("is_resign")
+  capturedStones String?  @map("captured_stones") @db.Text
+  moveTime       DateTime @default(now()) @map("move_time")
+
+  // Relations
+  game   Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player User @relation(fields: [playerId], references: [id])
+
+  @@map("moves")
+}
+
+model MatchmakingQueue {
+  id             Int      @id @default(autoincrement())
+  playerId       Int      @map("player_id")
+  ratingRangeMin Int      @map("rating_range_min")
+  ratingRangeMax Int      @map("rating_range_max")
+  boardSize      Int      @default(19) @map("board_size")
+  joinedAt       DateTime @default(now()) @map("joined_at")
+  expiresAt      DateTime @default(dbgenerated("(CURRENT_TIMESTAMP + INTERVAL '5 minutes')")) @map("expires_at")
+
+  // Relations
+  player User @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@map("matchmaking_queue")
+}
+
+model GameInvitation {
+  id        Int      @id @default(autoincrement())
+  inviterId Int      @map("inviter_id")
+  inviteeId Int      @map("invitee_id")
+  boardSize Int      @default(19) @map("board_size")
+  status    String   @default("pending") @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @default(dbgenerated("(CURRENT_TIMESTAMP + INTERVAL '1 hour')")) @map("expires_at")
+
+  // Relations
+  inviter User @relation("Inviter", fields: [inviterId], references: [id])
+  invitee User @relation("Invitee", fields: [inviteeId], references: [id])
+
+  @@map("game_invitations")
+}
