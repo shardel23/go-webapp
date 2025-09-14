@@ -299,10 +299,13 @@ export default function SimulationPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Game Board */}
-          <div className="lg:col-span-2">
-            <div className="bg-gray-100 p-4 rounded-lg">
+          <div className="lg:col-span-3">
+            <div className="bg-gray-100 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-black mb-4 text-center">
+                Go Board ({gameState.size}×{gameState.size})
+              </h3>
               <GoBoard
                 size={gameState.size}
                 moves={gameState.board

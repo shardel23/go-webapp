@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 interface GoBoardProps {
   size: number;
@@ -23,7 +23,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
     y: number;
   } | null>(null);
 
-  const drawBoard = () => {
+  const drawBoard = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -105,7 +105,7 @@ const GoBoard: React.FC<GoBoardProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
     }
-  };
+  }, [size, moves, hoveredIntersection, currentPlayer, disabled]);
 
   const getStarPoints = (boardSize: number) => {
     const points = [];
@@ -180,14 +180,14 @@ const GoBoard: React.FC<GoBoardProps> = ({
 
   useEffect(() => {
     drawBoard();
-  }, [size, moves, hoveredIntersection, currentPlayer, disabled]);
+  }, [size, moves, hoveredIntersection, currentPlayer, disabled, drawBoard]);
 
   return (
     <div className="flex justify-center">
       <canvas
         ref={canvasRef}
-        width={400}
-        height={400}
+        width={600}
+        height={600}
         className="border border-gray-800 cursor-pointer"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}

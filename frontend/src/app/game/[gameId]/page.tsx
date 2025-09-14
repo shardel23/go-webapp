@@ -28,6 +28,11 @@ interface Move {
   isResign: boolean;
   moveNumber: number;
   playerId: number;
+  capturedStones?: Array<{
+    x: number;
+    y: number;
+    color: "black" | "white";
+  }> | null;
 }
 
 interface GameState {
@@ -48,14 +53,19 @@ interface GameDetails {
   id: number;
   blackPlayer: User;
   whitePlayer: User;
+  blackPlayerId: number;
+  whitePlayerId: number;
   boardSize: number;
   status: string;
   winnerId: number | null;
+  winner?: "black" | "white" | "draw" | null;
   result: string | null;
   startedAt: string;
   finishedAt: string | null;
   moves: Move[];
   boardState?: string; // String representation: "0" = empty, "1" = black, "2" = white
+  blackScore?: number;
+  whiteScore?: number;
 }
 
 export default function GameViewPage() {
@@ -453,12 +463,14 @@ export default function GameViewPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Game Board */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-black">Game Board</h2>
+          <div className="lg:col-span-4">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-black">
+                  Game Board ({gameDetails.boardSize}×{gameDetails.boardSize})
+                </h2>
                 <div className="text-sm text-black">
                   Current Player:{" "}
                   <span
@@ -483,40 +495,47 @@ export default function GameViewPage() {
                 </div>
               </div>
 
-              <GoBoard
-                size={gameDetails.boardSize}
-                moves={
-                  gameDetails.boardState
-                    ? // Use board state if available (from real-time updates)
-                      gameDetails.boardState
-                        .split("")
-                        .map((char, index) => ({
-                          x: index % gameDetails.boardSize,
-                          y: Math.floor(index / gameDetails.boardSize),
-                          color: (char === "1"
-                            ? "black"
-                            : char === "2"
-                            ? "white"
-                            : "empty") as "black" | "white",
+              <div className="flex justify-center">
+                <GoBoard
+                  size={gameDetails.boardSize}
+                  moves={
+                    gameDetails.boardState
+                      ? // Use board state if available (from real-time updates)
+                        gameDetails.boardState
+                          .split("")
+                          .map((char, index) => ({
+                            x: index % gameDetails.boardSize,
+                            y: Math.floor(index / gameDetails.boardSize),
+                            color:
+                              char === "1"
+                                ? "black"
+                                : char === "2"
+                                ? "white"
+                                : null,
+                          }))
+                          .filter((stone) => stone.color !== null)
+                          .map((stone) => ({
+                            ...stone,
+                            color: stone.color as "black" | "white",
+                          }))
+                      : // Fall back to moves array (for initial load)
+                        gameDetails.moves.map((move) => ({
+                          x: move.xCoordinate || 0,
+                          y: move.yCoordinate || 0,
+                          color:
+                            move.playerId === gameDetails.blackPlayer?.id
+                              ? "black"
+                              : "white",
                         }))
-                        .filter((stone) => stone.color !== "empty")
-                    : // Fall back to moves array (for initial load)
-                      gameDetails.moves.map((move) => ({
-                        x: move.xCoordinate || 0,
-                        y: move.yCoordinate || 0,
-                        color:
-                          move.playerId === gameDetails.blackPlayer?.id
-                            ? "black"
-                            : "white",
-                      }))
-                }
-                onMove={
-                  isPlayer && gameDetails.status === "active"
-                    ? handleMove
-                    : () => {}
-                } // Allow moves if player and game is active
-                disabled={!isPlayer || gameDetails.status !== "active"} // Enable moves only for players in active games
-              />
+                  }
+                  onMove={
+                    isPlayer && gameDetails.status === "active"
+                      ? handleMove
+                      : () => {}
+                  } // Allow moves if player and game is active
+                  disabled={!isPlayer || gameDetails.status !== "active"} // Enable moves only for players in active games
+                />
+              </div>
 
               {/* Game Actions */}
               {isPlayer &&
@@ -682,7 +701,7 @@ export default function GameViewPage() {
           </div>
 
           {/* Game Info Sidebar */}
-          <div className="space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             {/* Players Info */}
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h3 className="text-lg font-semibold mb-4 text-black">Players</h3>
