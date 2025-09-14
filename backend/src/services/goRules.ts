@@ -502,8 +502,22 @@ export class GoRules {
     if (this.koPosition && this.koPosition.x === x && this.koPosition.y === y)
       return false;
 
-    // Check if move would be suicidal
     const stoneColor = this.currentPlayer;
+
+    // Check if placing the stone would capture anything
+    // Place stone temporarily
+    this.setStoneAt(x, y, { x, y, color: stoneColor });
+    // Check for captures of opponent stones
+    const wouldCapture = this.checkCaptures(x, y, stoneColor);
+    // Remove the temporary stone
+    this.setStoneAt(x, y, null);
+
+    // If we would capture stones, the move is legal (not suicidal)
+    if (wouldCapture.length > 0) {
+      return true;
+    }
+
+    // Check if move would be suicidal
     const isSuicidal = this.checkSelfCapture(x, y, stoneColor);
 
     return !isSuicidal;
