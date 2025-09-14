@@ -544,12 +544,36 @@ export class GoRules {
     // Reset ko position
     this.koPosition = null;
 
-    // Remove captured stones from the last move
-    // Note: This is simplified - in a real implementation, you'd need to track
-    // which stones were captured in each move to properly restore them
-    this.capturedStones = this.capturedStones.slice(0, -1);
+    // For simulation, we need to reconstruct the board state from remaining moves
+    // This is more complex than just removing the last move because we need to
+    // restore the board to the state before the last move was made
+    this.reconstructBoardFromMoves();
 
     return { success: true };
+  }
+
+  // Reconstruct board from moves (for undo functionality)
+  private reconstructBoardFromMoves(): void {
+    // Clear the board
+    this.board = "0".repeat(this.size * this.size);
+    this.capturedStones = [];
+
+    // Replay all remaining moves to reconstruct the board
+    for (const move of this.moves) {
+      // Place the stone
+      this.setStoneAt(move.x, move.y, move);
+
+      // Check for captures and update captured stones
+      const capturedStones = this.checkCaptures(move.x, move.y, move.color);
+      this.capturedStones.push(...capturedStones);
+
+      // Update ko position if exactly one stone was captured
+      if (capturedStones.length === 1) {
+        this.koPosition = { x: capturedStones[0].x, y: capturedStones[0].y };
+      } else {
+        this.koPosition = null;
+      }
+    }
   }
 
   // Set moves (for simulation)
