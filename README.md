@@ -5,6 +5,7 @@ A full-stack web application for playing the ancient board game Go (Weiqi/Baduk)
 ## 🎯 Features
 
 ### Core Game Features
+
 - **Complete Go Rules Implementation**: Legal moves, captures, ko rule, suicide prevention
 - **Multiple Board Sizes**: 9×9, 13×13, and 19×19 boards
 - **Real-time Multiplayer**: Live game sessions with WebSocket communication
@@ -14,6 +15,7 @@ A full-stack web application for playing the ancient board game Go (Weiqi/Baduk)
 - **User Authentication**: Secure login and registration system
 
 ### Technical Features
+
 - **Modern Tech Stack**: React/Next.js frontend, Node.js/Express backend
 - **Real-time Communication**: Socket.IO for live game updates
 - **Database Integration**: PostgreSQL with Prisma ORM
@@ -34,40 +36,45 @@ go-webapp/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - PostgreSQL 13+
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/shardel23/go-webapp.git
    cd go-webapp
    ```
 
 2. **Set up the database**
+
    ```bash
    # Install PostgreSQL (macOS)
    brew install postgresql
    brew services start postgresql
-   
+
    # Create database
    createdb go_webapp
    ```
 
 3. **Install dependencies**
+
    ```bash
    # Backend
    cd backend
    npm install
-   
+
    # Frontend
    cd ../frontend
    npm install
    ```
 
 4. **Configure environment**
+
    ```bash
    # Backend
    cd backend
@@ -76,17 +83,19 @@ go-webapp/
    ```
 
 5. **Set up the database schema**
+
    ```bash
    cd backend
    npx prisma migrate dev
    ```
 
 6. **Start the development servers**
+
    ```bash
    # Terminal 1 - Backend
    cd backend
    npm run dev
-   
+
    # Terminal 2 - Frontend
    cd frontend
    npm run dev
@@ -99,12 +108,14 @@ go-webapp/
 ## 🎮 How to Play
 
 ### Getting Started
+
 1. **Register/Login**: Create an account or sign in
 2. **Find a Game**: Use the matchmaking system to find an opponent
 3. **Play**: Place stones, capture opponent pieces, and control territory
 4. **Practice**: Use the simulation mode to practice and analyze positions
 
 ### Game Rules
+
 - **Objective**: Control more territory than your opponent
 - **Turns**: Black plays first, then players alternate
 - **Captures**: Surround opponent stones to capture them
@@ -118,6 +129,7 @@ go-webapp/
 ### Project Structure
 
 #### Frontend (`/frontend`)
+
 - **Framework**: Next.js 14 with App Router
 - **Styling**: Tailwind CSS
 - **Components**: Modular React components
@@ -125,6 +137,7 @@ go-webapp/
 - **Real-time**: Socket.IO client integration
 
 #### Backend (`/backend`)
+
 - **Framework**: Node.js with Express
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: JWT tokens with bcrypt
@@ -132,6 +145,7 @@ go-webapp/
 - **API**: RESTful endpoints for game management
 
 #### Database Schema
+
 - **Users**: Player accounts and ratings
 - **Games**: Game records and state
 - **Moves**: Individual move history
@@ -141,18 +155,21 @@ go-webapp/
 ### Key Components
 
 #### Game Engine (`backend/src/services/goRules.ts`)
+
 - Complete Go rules implementation
 - Move validation and capture logic
 - Game state management
 - Scoring and territory calculation
 
 #### Real-time System (`backend/src/socket/socketHandlers.ts`)
+
 - WebSocket connection management
 - Matchmaking and game creation
 - Live move broadcasting
 - Player synchronization
 
 #### Frontend Components
+
 - **GoBoard**: Interactive game board
 - **GameView**: Live game interface
 - **Simulation**: Practice mode
@@ -161,16 +178,19 @@ go-webapp/
 ## 📚 API Documentation
 
 ### Authentication
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `GET /api/auth/profile` - Get user profile
 
 ### Games
+
 - `GET /api/game/history` - Get user's game history
 - `GET /api/game/:gameId` - Get specific game details
 - `POST /api/game/invite` - Send game invitation
 
 ### Simulation
+
 - `GET /api/simulation/state` - Get simulation state
 - `POST /api/simulation/move` - Make a move in simulation
 - `POST /api/simulation/undo` - Undo last move
@@ -178,6 +198,7 @@ go-webapp/
 - `POST /api/simulation/export` - Export game state
 
 ### WebSocket Events
+
 - `join-matchmaking` - Join matchmaking queue
 - `leave-matchmaking` - Leave matchmaking queue
 - `match-found` - Game match found
@@ -189,18 +210,21 @@ go-webapp/
 ## 🧪 Testing
 
 ### Backend Testing
+
 ```bash
 cd backend
 npm test
 ```
 
 ### Frontend Testing
+
 ```bash
 cd frontend
 npm test
 ```
 
 ### Database Testing
+
 ```bash
 cd backend
 npx prisma studio
@@ -209,6 +233,7 @@ npx prisma studio
 ## 🚀 Deployment
 
 ### Production Build
+
 ```bash
 # Backend
 cd backend
@@ -222,6 +247,7 @@ npm start
 ```
 
 ### Environment Variables
+
 - `DATABASE_URL`: PostgreSQL connection string
 - `JWT_SECRET`: Secret key for JWT tokens
 - `FRONTEND_URL`: Frontend application URL
